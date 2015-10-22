@@ -1,0 +1,5 @@
+Manifest-Version: 0.1
+Created-By: li fei
+Built-Date: 2015-01-08
+Class-Path: ../lib/mallet.jar ../lib/mallet-deps.jar ../lib/stanford-corenlp-3.5.0.jar
+
