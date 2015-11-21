@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /*
  * Shuttle the objects and split them by the proportions that you give.
@@ -56,4 +57,22 @@ public class ObjectShuffle {
 
 		return ret;
 	}
+	
+	public static <T> List<T> getRandomSubList(List<T> input, int subsetSize)
+	  {
+	    int inputSize = input.size();
+	    if (subsetSize > inputSize)
+	      subsetSize = inputSize;
+
+	    Random random = new Random(System.currentTimeMillis());
+	  
+	    for (int i = 0; i < subsetSize; i++)
+	    {
+	      int indexToSwap = i + random.nextInt(inputSize - i);
+	      T temp = input.get(i);
+	      input.set(i, input.get(indexToSwap));
+	      input.set(indexToSwap, temp);
+	    }
+	    return input.subList(0, subsetSize);
+	  }
 }
