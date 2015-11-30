@@ -12,15 +12,15 @@ import cn.fox.math.Matrix;
  */
 public class KMeans {
 	public int k; // the number of classes
-	private ArrayList<Matrix> vectors; // vectors of input data
+	public ArrayList<Matrix> vectors; // vectors of input data
 	public int[] vectors2classes; // the i'st Integer denotes i belongs to class Integer 
-	private ArrayList<Matrix> centroids; // k centroids
-	private int iterationTimes;
+	public ArrayList<Matrix> centroids; // k centroids
+	public int iterationTimes;
 	
 	private static final int NO_CLASS = -1;
 	
 	// modify this function with various similarity metric
-	protected double similarity(Matrix a, Matrix b) throws Exception{
+	public double similarity(Matrix a, Matrix b) throws Exception{
 		return 1.0/(1.0+Matrix.distanceEuclidean(a,b));
 		
 	}
