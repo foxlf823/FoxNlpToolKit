@@ -4,15 +4,19 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Sider implements Serializable{
 
 	private static final long serialVersionUID = 1858016880365410639L;
-	public HashSet<Pair> list; 
+	public HashSet<Pair> set; 
+	public HashSet<String> drug = new HashSet<>();
+	public HashSet<String> disease = new HashSet<>();
+	public ArrayList<Pair> list = new ArrayList<>();
 	
 	public Sider(String path) {
-		list = new HashSet<Pair>();
+		set = new HashSet<Pair>();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "utf-8"));
 			String thisLine = null;
@@ -23,7 +27,12 @@ public class Sider implements Serializable{
 					Pair pair = new Pair();
 					pair.drug = chunks[3].toLowerCase();
 					pair.sideEffect = chunks[4].toLowerCase();
-					list.add(pair);
+					if(!set.contains(pair)) {
+						list.add(pair);
+						set.add(pair);
+					}
+					drug.add(pair.drug);
+					disease.add(pair.sideEffect);
 				}
 					
 			}
@@ -33,6 +42,17 @@ public class Sider implements Serializable{
 		}
 	}
 	
+	// 0-not, 1-disease, 2-chemical
+	public int contains(String something) {
+		String lower = something.toLowerCase();
+		if(drug.contains(lower))
+			return 2;
+		else if(disease.contains(lower))
+			return 1;
+		
+		return 0;
+	}
+	
 	/*
 	 * Whether the dictionary contains the "word" with case ignoring
 	 */
@@ -40,7 +60,7 @@ public class Sider implements Serializable{
 		Pair pair = new Pair();
 		pair.drug = drug.toLowerCase();
 		pair.sideEffect = sideEffect.toLowerCase();
-		return list.contains(pair);
+		return set.contains(pair);
 		
 	}
 	
