@@ -30,14 +30,23 @@ public class SentenceSplitter {
 	
 	private boolean isChinese;
 	
-	private HashSet<String> englishAbbr;
+	private ArrayList<String> englishAbbr;
+	
+	private boolean isEmptyChar(char pp) {
+		if(pp==' ' || pp=='\n' || pp=='\r' || pp=='\t')
+			return true;
+		else
+			return false;
+	}
 	
 	private void loadEnglishAbbr(String filePathEnglishAbbr) {
-		englishAbbr = new HashSet<String>();
+		englishAbbr = new ArrayList<String>();
 		try {
 			String line = "";
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePathEnglishAbbr), "utf-8"));
 			while ((line = br.readLine()) != null) {
+				if(line.charAt(0) == '#')
+					continue;
 				englishAbbr.add(line);
 			}    
 			br.close();
@@ -114,6 +123,9 @@ public class SentenceSplitter {
 					if(filterFullStopWithNumbers(sBeginIndex, s)) {
 						split = false;
 						step = 2;
+					} else if(filterOneUpperWord(sBeginIndex, s)) {
+						split = false;
+						step = 1;
 					}
 					else if((matchedAbbr = filterAbbr(sBeginIndex, s)) != null) {
 						split = false;
@@ -143,20 +155,40 @@ public class SentenceSplitter {
 	
 	// Ones below are some heuristic rules to help the splitter.
 	
+	// If there is only one uppercased word with a dot(current), we don't split it.
+	private boolean filterOneUpperWord(int currentIndex, String s) {
+		if(currentIndex >= 2) { 
+			char previous = s.charAt(currentIndex-1);
+			char pp = s.charAt(currentIndex-2);
+			if(CharCode.isUpperCase(previous) && (isEmptyChar(pp) || Punctuation.isEnglishPunc(pp)))
+				return true;
+			else
+				return false;
+		} else if(currentIndex == 1) {
+			char previous = s.charAt(currentIndex-1);
+			if(CharCode.isUpperCase(previous))
+				return true;
+			else
+				return false;
+		} else
+			return false;
+			
+	}
+	
 	// If there are words which match the abbr, we don't split it.
 	private String filterAbbr(int currentIndex, String s) {
 		String matchedAbbr = null;
 		for(String abbr:englishAbbr) {
 			int tempIndex = currentIndex;
 			int j=abbr.length()-1;
-			for(;j>=0;j--) {
+			for(;j>=0;j--,tempIndex--) {
 				if(tempIndex<0) // the string in sentence is less than the string in abbr.
 					break;
 				if(Character.toLowerCase(abbr.charAt(j)) != Character.toLowerCase(s.charAt(tempIndex)))
 					break;
-				tempIndex--;
+				
 			}
-			if(j<0) {
+			if(j<0 && (tempIndex<0 || (tempIndex>=0 && (isEmptyChar(s.charAt(tempIndex)) || Punctuation.isEnglishPunc(s.charAt(tempIndex))) ))) {
 				// match
 				matchedAbbr = abbr;
 				break;
